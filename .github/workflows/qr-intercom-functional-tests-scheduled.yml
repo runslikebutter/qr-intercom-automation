@@ -1,0 +1,32 @@
+name: QR Intercom - Functional Tests (Scheduled)
+on:
+  schedule:
+    - cron: "0 9 * * *" # Every day at 9:00 AM UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  run-functional-tests:
+    uses: ./.github/workflows/qr-intercom-functional-tests.yml
+    secrets:
+      E2E_TEST_BASE_URL: ${{ secrets.E2E_TEST_BASE_URL }}
+
+  # Post to Slack
+  slack-success:
+    needs: [run-functional-tests]
+    uses: runslikebutter/github-workflows/.github/workflows/e2e-slack.yml@v23
+    with:
+      message: '*QR Intercom Functional Tests: :large_green_circle: PASS* hooked to \`staging\` backend'
+    secrets:
+      E2E_SLACK_WEBHOOK_URL: ${{ secrets.E2E_SLACK_WEBHOOK_URL }}
+
+  slack-failure:
+    needs: [run-functional-tests]
+    if: failure()
+    uses: runslikebutter/github-workflows/.github/workflows/e2e-slack.yml@v23
+    with:
+      message: '*QR Intercom Functional Tests: :red_circle: FAIL* hooked to \`staging\` backend'
+    secrets:
+      E2E_SLACK_WEBHOOK_URL: ${{ secrets.E2E_SLACK_WEBHOOK_URL }}

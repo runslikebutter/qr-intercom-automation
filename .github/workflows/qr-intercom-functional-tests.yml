@@ -1,0 +1,55 @@
+name: QR Intercom - Functional Tests
+
+on:
+  workflow_call:
+    inputs:
+      E2E_TEST_REF:
+        default: main
+        description: The branch or tag of this repo to check out for the tests
+        required: false
+        type: string
+    secrets:
+      E2E_TEST_BASE_URL:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  functional-tests:
+    name: Run functional tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.E2E_TEST_REF }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.11.0'
+          cache: 'npm'
+          cache-dependency-path: test-playwright/package-lock.json
+
+      - name: Install dependencies
+        working-directory: test-playwright
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: test-playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Run functional tests
+        working-directory: test-playwright
+        env:
+          E2E_TEST_BASE_URL: ${{ secrets.E2E_TEST_BASE_URL }}
+        run: npm run test:functional
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: test-playwright/playwright-report/
+          retention-days: 14
