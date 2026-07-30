@@ -30,7 +30,7 @@ test.describe('Text message screen', () => {
     'should enable the send control once a message is typed',
     { tag: '@regression' },
     async ({ textMessagePage }) => {
-      const { body } = generateMessage();
+      const { body } = await generateMessage();
 
       await test.step('WHEN a message is typed', async () => {
         await textMessagePage.typeMessage(body);

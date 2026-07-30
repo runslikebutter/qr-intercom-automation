@@ -18,7 +18,7 @@ jobs:
     needs: [run-functional-tests]
     uses: runslikebutter/github-workflows/.github/workflows/e2e-slack.yml@v23
     with:
-      message: '*QR Intercom Functional Tests: :large_green_circle: PASS* hooked to \`staging\` backend'
+      message: '*QR Intercom Functional Tests: :large_green_circle: PASS* hooked to \`sandbox\` backend'
     secrets:
       E2E_SLACK_WEBHOOK_URL: ${{ secrets.E2E_SLACK_WEBHOOK_URL }}
 
@@ -27,6 +27,6 @@ jobs:
     if: failure()
     uses: runslikebutter/github-workflows/.github/workflows/e2e-slack.yml@v23
     with:
-      message: '*QR Intercom Functional Tests: :red_circle: FAIL* hooked to \`staging\` backend'
+      message: '*QR Intercom Functional Tests: :red_circle: FAIL* hooked to \`sandbox\` backend'
     secrets:
       E2E_SLACK_WEBHOOK_URL: ${{ secrets.E2E_SLACK_WEBHOOK_URL }}
